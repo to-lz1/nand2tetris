@@ -1,6 +1,4 @@
 class Parser
-  attr_accessor :current_command
-
   def initialize(file_path)
     @src = File.open(file_path)
     advance_internal
@@ -35,6 +33,11 @@ class Parser
   def symbol
     # TODO
     raise NotImplementedError
+  end
+
+  def address
+    # TODO: no Guard for Command other than A.
+    @current_command.value.to_i
   end
 
   def dest
