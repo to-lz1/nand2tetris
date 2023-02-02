@@ -9,14 +9,22 @@ class Parser
   end
 
   def advance
-    a_match = @current_line.match(/^@(\d+)$/)
+    current_value = @current_line.gsub(/\/\/.*$/, '').strip
+    a_match = current_value.match(/@(.+)$/)
     if a_match
       @current_command = ACommand.new(a_match[1])
       advance_internal
       return
     end
 
-    c_match = @current_line.match(/((.+)=)?([^;]+)(;(.+))?/)
+    l_match = current_value.match(/\(([A-Z\_]+)\)/)
+    if l_match
+      @current_command = LCommand.new(l_match[1])
+      advance_internal
+      return
+    end
+
+    c_match = current_value.match(/((.+)=)?([^;]+)(;(.+))?/)
     if c_match
       @current_command = CCommand.new(c_match[2], c_match[3], c_match[5])
       advance_internal
@@ -31,8 +39,9 @@ class Parser
   end
 
   def symbol
-    # TODO
-    raise NotImplementedError
+    Integer(@current_command.value)
+  rescue ArgumentError
+    @current_command.value
   end
 
   def address
@@ -104,5 +113,17 @@ class CCommand < Command
 
   def type
     return "C_COMMAND"
+  end
+end
+
+class LCommand < Command
+  attr_accessor :value
+
+  def initialize(value)
+    @value = value
+  end
+
+  def type
+    return "L_COMMAND"
   end
 end
