@@ -1,4 +1,4 @@
-// excepted from original Max.asm for testing
+// excerpted from original Max.asm for testing
    @R0
    D=M              // D = first number
    @OUTPUT_FIRST

@@ -4,10 +4,11 @@ require './code'
 require './parser'
 
 def assemble(source_path)
+  symbol_table = SymbolTable.new
+
   # first path: add entries that represents pseudo command into symbol table
   first_path_parser = Parser.new(source_path)
   address = 0
-  symbol_table = SymbolTable.new
   while first_path_parser.has_more_commands? do
     first_path_parser.advance
     case first_path_parser.command_type

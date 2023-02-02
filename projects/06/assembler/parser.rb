@@ -39,29 +39,21 @@ class Parser
   end
 
   def symbol
-    Integer(@current_command.value)
+    Integer(@current_command&.value)
   rescue ArgumentError
-    @current_command.value
-  end
-
-  def address
-    # TODO: no Guard for Command other than A.
-    @current_command.value.to_i
+    @current_command&.value
   end
 
   def dest
-    # TODO: no Guard for Command other than C.
-    @current_command.dest
+    @current_command&.dest
   end
 
   def comp
-    # TODO: no Guard for Command other than C.
-    @current_command.comp
+    @current_command&.comp
   end
 
   def jump
-    # TODO: no Guard for Command other than C.
-    @current_command.jump
+    @current_command&.jump
   end
 
   private
@@ -86,7 +78,7 @@ class Command
   end
 
   def type
-    raise NotImplementedError, 'implent this method in each child class.'
+    raise NotImplementedError, 'implement this method in each child class.'
   end
 end
 
