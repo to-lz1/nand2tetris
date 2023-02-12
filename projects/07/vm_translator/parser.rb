@@ -23,7 +23,7 @@ class Parser
     end
 
     if current_value.match?(/^(add|sub|neg|eq|gt|lt|and|or|not)/)
-      @command_type = 'C_ALITHMETIC'
+      @command_type = 'C_ARITHMETIC'
       @arg1 = tokens[0]
       @arg2 = nil
       advance_internal
