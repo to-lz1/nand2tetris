@@ -21,7 +21,7 @@ describe "parser" do
     expect(parser.has_more_commands?).to be(true)
 
     parser.advance
-    expect(parser.command_type).to eq("C_ALITHMETIC")
+    expect(parser.command_type).to eq("C_ARITHMETIC")
     expect(parser.arg1).to eq("add")
     expect(parser.arg2).to be_nil
     expect(parser.has_more_commands?).to be(false)
