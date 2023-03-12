@@ -14,8 +14,8 @@ class Parser
     current_value = @current_line.gsub(/\/\/.*$/, '').strip
     tokens = current_value.split(' ')
 
-    if tokens[0] == 'push'
-      @command_type = 'C_PUSH'
+    if ['push', 'pop'].include?(tokens[0])
+      @command_type = "C_#{tokens[0].upcase}"
       @arg1 = tokens[1]
       @arg2 = tokens[2]&.to_i
       advance_internal

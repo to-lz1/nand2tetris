@@ -30,28 +30,32 @@ class CodeWriter
   end
 
   def write_push_pop(command, segment, index)
-    # todo: constantしか考えてない
     case command
     when 'C_PUSH'
-      @file.write("@" +  index.to_s + "\n")
-      @file.write("D=A" + "\n")
+      case segment
+      when 'constant'
+        @file.write("@" +  index.to_s + "\n")
+        @file.write("D=A" + "\n")
+      when 'local', 'argument', 'this', 'that', 'temp', 'pointer'
+        @file.write("@" +  RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym] + "\n")
+        @file.write("A=M" + "\n") if ['local', 'argument', 'this', 'that'].include?(segment)
+        index.times { |i|
+          @file.write("A=A+1" + "\n")
+        }
+        @file.write("D=M" + "\n")
+      end
 
-      @file.write("@SP" + "\n")
-      @file.write("A=M" + "\n")
-      @file.write("M=D" + "\n")
-
-      @file.write("@SP" + "\n")
-      @file.write("M=M+1" + "\n")
+      write_push_into_stack
     when 'C_POP'
-      @file.write("@SP" + "\n")
-      @file.write("A=M" + "\n")
+      write_pop_from_stack
       @file.write("D=M" + "\n")
 
-      @file.write("@" + index.to_s + "\n")
+      @file.write("@" +  RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym] + "\n")
+      @file.write("A=M" + "\n") if ['local', 'argument', 'this', 'that'].include?(segment)
+      index.times { |i|
+        @file.write("A=A+1" + "\n")
+      }
       @file.write("M=D" + "\n")
-
-      @file.write("@SP" + "\n")
-      @file.write("M=M-1" + "\n")
     end
   end
 
@@ -60,6 +64,16 @@ class CodeWriter
   end
 
   private
+
+  # p.156のmemory segment mappingを参照
+  RESERVED_KEYWORDS_TO_REGISTERS = {
+    local: 'LCL',
+    argument: 'ARG',
+    this: 'THIS',
+    that: 'THAT',
+    pointer: '3',
+    temp: '5'
+  }
 
   def init_stream(file_name)
     @file = File.open(file_name, "w")
@@ -70,8 +84,6 @@ class CodeWriter
   def write_pop_from_stack
     @file.write("@SP" + "\n")
     @file.write("M=M-1" + "\n")
-
-    @file.write("@SP" + "\n")
     @file.write("A=M" + "\n")
   end
 
