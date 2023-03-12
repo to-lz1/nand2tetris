@@ -1,4 +1,6 @@
 #! /usr/bin/env ruby
+# frozen_string_literal: true
+
 require './code_writer'
 require './parser'
 
@@ -9,7 +11,7 @@ def translate(source_path)
   writer = CodeWriter.new
   writer.set_file_name(output_name)
 
-  while parser.has_more_commands? do
+  while parser.has_more_commands?
     parser.advance
     case parser.command_type
     when 'C_ARITHMETIC'
@@ -28,6 +30,4 @@ def output_file_path(source_path)
   File.join(dirname, basename)
 end
 
-if $0 == __FILE__
-  translate(ARGV[0])
-end
+translate(ARGV[0]) if $PROGRAM_NAME == __FILE__

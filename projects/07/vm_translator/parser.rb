@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Parser
   attr_accessor :command_type, :arg1, :arg2
 
@@ -11,10 +13,10 @@ class Parser
   end
 
   def advance
-    current_value = @current_line.gsub(/\/\/.*$/, '').strip
+    current_value = @current_line.gsub(%r{//.*$}, '').strip
     tokens = current_value.split(' ')
 
-    if ['push', 'pop'].include?(tokens[0])
+    if %w[push pop].include?(tokens[0])
       @command_type = "C_#{tokens[0].upcase}"
       @arg1 = tokens[1]
       @arg2 = tokens[2]&.to_i
@@ -30,20 +32,18 @@ class Parser
       return
     end
 
-    fail "Complie Error. invalid string '#{line}' at line #{@src.lineno}"
+    raise "Complie Error. invalid string '#{line}' at line #{@src.lineno}"
   end
 
   private
 
   def advance_internal
     @current_line = read_with_normalize
-    while !@src.closed? && (@current_line.empty? || @current_line.match(/^\/\//))
-      @current_line = read_with_normalize
-    end
+    @current_line = read_with_normalize while !@src.closed? && (@current_line.empty? || @current_line.match(%r{^//}))
   end
 
   def read_with_normalize
-    return @src.readline.gsub(/\r|\n/, '')
+    @src.readline.gsub(/\r|\n/, '')
   rescue EOFError
     @src.close
   end
