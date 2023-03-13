@@ -3,6 +3,7 @@
 class CodeWriter
   def set_file_name(file_name)
     init_stream(file_name)
+    @basename = File.basename(file_name, '.asm')
     @label_index = 0
   end
 
@@ -34,30 +35,9 @@ class CodeWriter
   def write_push_pop(command, segment, index)
     case command
     when 'C_PUSH'
-      case segment
-      when 'constant'
-        @file.write("@#{index}\n")
-        @file.write("D=A\n")
-      when 'local', 'argument', 'this', 'that', 'temp', 'pointer'
-        @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym]}\n")
-        @file.write("A=M\n") if %w[local argument this that].include?(segment)
-        index.times do |_i|
-          @file.write("A=A+1\n")
-        end
-        @file.write("D=M\n")
-      end
-
-      write_push_into_stack
+      write_push_procedure_by_segment(segment, index)
     when 'C_POP'
-      write_pop_from_stack
-      @file.write("D=M\n")
-
-      @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym]}\n")
-      @file.write("A=M\n") if %w[local argument this that].include?(segment)
-      index.times do |_i|
-        @file.write("A=A+1\n")
-      end
-      @file.write("M=D\n")
+      write_pop_procedure_by_segment(segment, index)
     end
   end
 
@@ -79,6 +59,41 @@ class CodeWriter
 
   def init_stream(file_name)
     @file = File.open(file_name, 'w')
+  end
+
+  def write_push_procedure_by_segment(segment, index)
+    case segment
+    when 'constant'
+      @file.write("@#{index}\n")
+      @file.write("D=A\n")
+    when 'local', 'argument', 'this', 'that', 'temp', 'pointer'
+      @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym]}\n")
+      @file.write("A=M\n") if %w[local argument this that].include?(segment)
+      index.times do |_i|
+        @file.write("A=A+1\n")
+      end
+      @file.write("D=M\n")
+    when 'static'
+      @file.write("@#{@basename}.#{index}\n")
+      @file.write("D=M\n")
+    end
+    write_push_into_stack
+  end
+
+  def write_pop_procedure_by_segment(segment, index)
+    write_pop_from_stack
+    @file.write("D=M\n")
+    case segment
+    when 'local', 'argument', 'this', 'that', 'temp', 'pointer'
+      @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym]}\n")
+      @file.write("A=M\n") if %w[local argument this that].include?(segment)
+      index.times do |_i|
+        @file.write("A=A+1\n")
+      end
+    when 'static'
+      @file.write("@#{@basename}.#{index}\n")
+    end
+    @file.write("M=D\n")
   end
 
   # pop from stack and set popped value address into A register,
