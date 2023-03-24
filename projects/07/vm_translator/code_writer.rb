@@ -8,7 +8,11 @@ class CodeWriter
   end
 
   def write_init
-    raise NotImprementedError.new
+    @file.write("@SP\n")
+    @file.write("M=256\n")
+    @file.write("@Sys.init\n")
+    @file.write("0;JMP\n")
+    @file.write("(@Sys.init)\n")
   end
 
   def write_arithmetic(command)
@@ -46,19 +50,54 @@ class CodeWriter
   end
 
   def write_label(label)
-    raise NotImprementedError.new
+    @file.write("(#{label})\n")
   end
 
   def write_goto(label)
-    raise NotImprementedError.new
+    @file.write("@#{label}")
+    @file.write("0;JMP")
   end
 
   def write_if(label)
-    raise NotImprementedError.new
+    write_pop_from_stack
+    @file.write("@#{label}")
+    @file.write("D;JMP")
   end
 
   def write_call(func_name, args_size)
-    raise NotImprementedError.new
+    return_label = get_label('return')
+    @file.write("@#{return_label}\n")
+    @file.write("D=A\n")
+    write_push_into_stack
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}")
+    @file.write("D=M\n")
+    write_push_into_stack
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:argument]}")
+    @file.write("D=M\n")
+    write_push_into_stack
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:this]}")
+    @file.write("D=M\n")
+    write_push_into_stack
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:that]}")
+    @file.write("D=M\n")
+    write_push_into_stack
+
+    @file.write("@SP\n")
+    @file.write("D=M\n")
+    @file.write("@#{5 + args_size}\n")
+    @file.write("D=D-A\n")
+
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:argument]}\n")
+    @file.write("M=D\n")
+
+    @file.write("@SP\n")
+    @file.write("D=M\n")
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}\n")
+    @file.write("M=D\n")
+
+    @file.write("@#{func_name}")
+    @file.write("0;JMP")
+    @file.write("(#{return_label})")
   end
 
   def write_function(func_name, locals_size)
@@ -132,7 +171,7 @@ class CodeWriter
     @file.write("A=M\n")
   end
 
-  # push D register value into stuck
+  # push D register value into stack
   def write_push_into_stack
     @file.write("@SP\n")
     @file.write("A=M\n")
