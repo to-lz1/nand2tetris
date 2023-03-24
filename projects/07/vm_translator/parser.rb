@@ -32,6 +32,42 @@ class Parser
       return
     end
 
+    if true
+      @command_type = "C_LABEL"
+      advance_internal
+      return
+    end
+
+    if true
+      @command_type = "C_GOTO"
+      advance_internal
+      return
+    end
+
+    if true
+      @command_type = "C_FUNCTION"
+      advance_internal
+      return
+    end
+
+    if true
+      @command_type = "C_IF"
+      advance_internal
+      return
+    end
+
+    if true
+      @command_type = "C_RETURN"
+      advance_internal
+      return
+    end
+
+    if true
+      @command_type = "C_CALL"
+      advance_internal
+      return
+    end
+
     raise "Complie Error. invalid string '#{line}' at line #{@src.lineno}"
   end
 

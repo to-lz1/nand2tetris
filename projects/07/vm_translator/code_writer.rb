@@ -7,6 +7,10 @@ class CodeWriter
     @label_index = 0
   end
 
+  def write_init
+    raise NotImprementedError.new
+  end
+
   def write_arithmetic(command)
     case command
     when 'add'
@@ -39,6 +43,30 @@ class CodeWriter
     when 'C_POP'
       write_pop_procedure_by_segment(segment, index)
     end
+  end
+
+  def write_label(label)
+    raise NotImprementedError.new
+  end
+
+  def write_goto(label)
+    raise NotImprementedError.new
+  end
+
+  def write_if(label)
+    raise NotImprementedError.new
+  end
+
+  def write_call(func_name, args_size)
+    raise NotImprementedError.new
+  end
+
+  def write_function(func_name, locals_size)
+    raise NotImprementedError.new
+  end
+
+  def write_return
+    raise NotImprementedError.new
   end
 
   def close
