@@ -101,11 +101,44 @@ class CodeWriter
   end
 
   def write_function(func_name, locals_size)
-    raise NotImprementedError.new
+    @file.write("D=0")
+    locals_size.times do |_i|
+      write_push_into_stack
+    end
   end
 
   def write_return
-    raise NotImprementedError.new
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}\n")
+    @file.write("D=M\n")
+    @file.write("@R9\n")
+    @file.write("M=D\n")
+    @file.write("@5\n")
+    # return address = LCL - 5
+    @file.write("D=D-A\n")
+    @file.write("@R10\n")
+    @file.write("M=D\n")
+
+    write_pop_from_stack
+    @file.write("D=D+1\n")
+    @file.write("@SP\n")
+    @file.write("M=D\n")
+
+    @file.write("@R9\n")
+    @file.write("D=M-1\n")
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:that]}\n")
+    @file.write("M=D\n")
+    @file.write("D=D-1\n")
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:this]}\n")
+    @file.write("M=D\n")
+    @file.write("D=D-1\n")
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:argument]}\n")
+    @file.write("M=D\n")
+    @file.write("D=D-1\n")
+    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}\n")
+    @file.write("M=D\n")
+
+    @file.write("@R10\n")
+    @file.write("0;JMP\n")
   end
 
   def close
