@@ -56,14 +56,14 @@ class CodeWriter
   end
 
   def write_goto(label)
-    @file.write("@#{label}")
-    @file.write("0;JMP")
+    @file.write("@#{label}\n")
+    @file.write("0;JMP\n")
   end
 
   def write_if(label)
     write_pop_from_stack
-    @file.write("@#{label}")
-    @file.write("D;JMP")
+    @file.write("@#{label}\n")
+    @file.write("D;JMP\n")
   end
 
   def write_call(func_name, args_size)
@@ -71,16 +71,16 @@ class CodeWriter
     @file.write("@#{return_label}\n")
     @file.write("D=A\n")
     write_push_into_stack
-    @file.write("@#{REGISTERS[:local]}")
+    @file.write("@#{REGISTERS[:local]}\n")
     @file.write("D=M\n")
     write_push_into_stack
-    @file.write("@#{REGISTERS[:argument]}")
+    @file.write("@#{REGISTERS[:argument]}\n")
     @file.write("D=M\n")
     write_push_into_stack
-    @file.write("@#{REGISTERS[:this]}")
+    @file.write("@#{REGISTERS[:this]}\n")
     @file.write("D=M\n")
     write_push_into_stack
-    @file.write("@#{REGISTERS[:that]}")
+    @file.write("@#{REGISTERS[:that]}\n")
     @file.write("D=M\n")
     write_push_into_stack
 
@@ -96,13 +96,13 @@ class CodeWriter
     @file.write("@#{REGISTERS[:local]}\n")
     @file.write("M=D\n")
 
-    @file.write("@#{func_name}")
-    @file.write("0;JMP")
-    @file.write("(#{return_label})")
+    @file.write("@#{func_name}\n")
+    @file.write("0;JMP\n")
+    @file.write("(#{return_label})\n")
   end
 
   def write_function(func_name, locals_size)
-    @file.write("D=0")
+    @file.write("D=0\n")
     locals_size.times do |_i|
       write_push_into_stack
     end

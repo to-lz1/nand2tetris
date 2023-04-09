@@ -18,7 +18,22 @@ def translate(source_path)
       writer.write_arithmetic(parser.arg1)
     when 'C_POP', 'C_PUSH'
       writer.write_push_pop(parser.command_type, parser.arg1, parser.arg2)
+    when 'C_LABEL'
+      writer.write_label(parser.arg1)
+    when 'C_GOTO'
+      writer.write_goto(parser.arg1)
+    when 'C_IF'
+      writer.write_if(parser.arg1)
+    when 'C_CALL'
+      writer.write_call(parser.arg1, parser.arg2)
+    when 'C_RETURN'
+      writer.write_return
+    when 'C_FUNCTION'
+      writer.write_function(parser.arg1, parser.arg2)
+    else
+      raise ArgumentError, "invalid command type. command type: #{parser.command_type}"
     end
+
   end
 
   writer.close

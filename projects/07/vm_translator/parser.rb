@@ -32,38 +32,49 @@ class Parser
       return
     end
 
-    if true
+    if current_value.match?(/^label/)
       @command_type = "C_LABEL"
+      @arg1 = tokens[1]
+      @arg2 = nil
       advance_internal
       return
     end
 
-    if true
+    if current_value.match?(/^goto/)
       @command_type = "C_GOTO"
+      @arg1 = tokens[1]
+      @arg2 = nil
       advance_internal
       return
     end
 
-    if true
+    if current_value.match?(/^function/)
       @command_type = "C_FUNCTION"
+      @arg1 = tokens[1]
+      @arg2 = tokens[2]
       advance_internal
       return
     end
 
-    if true
+    if current_value.match?(/^if\-goto/)
       @command_type = "C_IF"
+      @arg1 = tokens[1]
+      @arg2 = nil
       advance_internal
       return
     end
 
-    if true
+    if current_value.match?(/^return/)
       @command_type = "C_RETURN"
+      @arg1, @arg2 = nil
       advance_internal
       return
     end
 
-    if true
+    if current_value.match?(/^call/)
       @command_type = "C_CALL"
+      @arg1 = tokens[1]
+      @arg2 = tokens[2]
       advance_internal
       return
     end
