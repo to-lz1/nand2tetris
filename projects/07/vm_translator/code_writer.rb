@@ -106,7 +106,7 @@ class CodeWriter
     @current_func_name = func_name
 
     @file.write("D=0\n")
-    locals_size.times do |_i|
+    locals_size.to_i.times do |_i|
       write_push_into_stack
     end
   end
