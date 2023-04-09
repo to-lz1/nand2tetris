@@ -52,23 +52,23 @@ class CodeWriter
   end
 
   def write_label(label)
-    @file.write("(#{label})\n")
+    @file.write("(#{get_label(label)})\n")
   end
 
   def write_goto(label)
-    @file.write("@#{label}\n")
+    @file.write("@#{get_label(label)}\n")
     @file.write("0;JMP\n")
   end
 
   def write_if(label)
     write_pop_from_stack
     @file.write("D=M\n")
-    @file.write("@#{label}\n")
+    @file.write("@#{get_label(label)}\n")
     @file.write("D;JNE\n")
   end
 
   def write_call(func_name, args_size)
-    return_label = get_label('return')
+    return_label = get_internal_label('return')
     @file.write("@#{return_label}\n")
     @file.write("D=A\n")
     write_push_into_stack
@@ -103,6 +103,8 @@ class CodeWriter
   end
 
   def write_function(func_name, locals_size)
+    @current_func_name = func_name
+
     @file.write("D=0\n")
     locals_size.times do |_i|
       write_push_into_stack
@@ -110,6 +112,8 @@ class CodeWriter
   end
 
   def write_return
+    @current_func_name = nil
+
     # define R9 as FRAME, and set LCL value to FRAME
     @file.write("@#{REGISTERS[:local]}\n")
     @file.write("D=M\n")
@@ -247,8 +251,8 @@ class CodeWriter
     write_pop_from_stack
     @file.write("D=M-D\n")
 
-    push_true_label = get_label('PUSH_TRUE')
-    comp_end_label = get_label('COMP_END')
+    push_true_label = get_internal_label('PUSH_TRUE')
+    comp_end_label = get_internal_label('COMP_END')
 
     @file.write("@#{push_true_label}\n")
     @file.write("D;#{mnemonic}\n")
@@ -264,7 +268,14 @@ class CodeWriter
     write_push_into_stack
   end
 
-  def get_label(prefix)
+  # use this when label name is passed from VM code.
+  def get_label(label)
+    prefix = @current_func_name ? "#{@current_func_name}$" : ''
+    "#{prefix}#{label}"
+  end
+
+  # use this when internal program flow needs label name.
+  def get_internal_label(prefix)
     label = "#{prefix}_#{@label_index}"
     @label_index += 1
     label
