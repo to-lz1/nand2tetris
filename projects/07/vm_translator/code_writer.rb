@@ -62,8 +62,9 @@ class CodeWriter
 
   def write_if(label)
     write_pop_from_stack
+    @file.write("D=M\n")
     @file.write("@#{label}\n")
-    @file.write("D;JMP\n")
+    @file.write("D;JNE\n")
   end
 
   def write_call(func_name, args_size)
