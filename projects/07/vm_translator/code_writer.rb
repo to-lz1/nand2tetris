@@ -46,6 +46,8 @@ class CodeWriter
       write_push_procedure_by_segment(segment, index)
     when 'C_POP'
       write_pop_procedure_by_segment(segment, index)
+    else
+      raise ArgumentError, "invalid command. command: #{command}"
     end
   end
 
@@ -86,7 +88,6 @@ class CodeWriter
     @file.write("D=M\n")
     @file.write("@#{5 + args_size}\n")
     @file.write("D=D-A\n")
-
     @file.write("@#{REGISTERS[:argument]}\n")
     @file.write("M=D\n")
 
@@ -108,20 +109,29 @@ class CodeWriter
   end
 
   def write_return
+    # define R9 as FRAME, and set LCL value to FRAME
     @file.write("@#{REGISTERS[:local]}\n")
     @file.write("D=M\n")
     @file.write("@R9\n")
     @file.write("M=D\n")
+
+    # get return address(= LCL - 5), and set it to TEMP variable
     @file.write("@5\n")
-    # return address = LCL - 5
     @file.write("D=D-A\n")
     @file.write("@R10\n")
     @file.write("M=D\n")
 
+    # pop return value of the function, write its value to ARG address
+    # ('cause its te next position from existing function frames)
     write_pop_from_stack
-    @file.write("D=D+1\n")
-    @file.write("@SP\n")
+    @file.write("D=M\n")
+    @file.write("@#{REGISTERS[:argument]}\n")
     @file.write("M=D\n")
+
+    # set SP to ARG + 1
+    @file.write("D=A+1\n")
+    @file.write("@SP\n")
+    @file.write("A=D\n")
 
     @file.write("@R9\n")
     @file.write("D=M-1\n")
@@ -137,7 +147,9 @@ class CodeWriter
     @file.write("@#{REGISTERS[:local]}\n")
     @file.write("M=D\n")
 
+    # go to return address
     @file.write("@R10\n")
+    @file.write("A=M\n")
     @file.write("0;JMP\n")
   end
 
