@@ -69,16 +69,16 @@ class CodeWriter
     @file.write("@#{return_label}\n")
     @file.write("D=A\n")
     write_push_into_stack
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}")
+    @file.write("@#{REGISTERS[:local]}")
     @file.write("D=M\n")
     write_push_into_stack
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:argument]}")
+    @file.write("@#{REGISTERS[:argument]}")
     @file.write("D=M\n")
     write_push_into_stack
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:this]}")
+    @file.write("@#{REGISTERS[:this]}")
     @file.write("D=M\n")
     write_push_into_stack
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:that]}")
+    @file.write("@#{REGISTERS[:that]}")
     @file.write("D=M\n")
     write_push_into_stack
 
@@ -87,12 +87,12 @@ class CodeWriter
     @file.write("@#{5 + args_size}\n")
     @file.write("D=D-A\n")
 
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:argument]}\n")
+    @file.write("@#{REGISTERS[:argument]}\n")
     @file.write("M=D\n")
 
     @file.write("@SP\n")
     @file.write("D=M\n")
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}\n")
+    @file.write("@#{REGISTERS[:local]}\n")
     @file.write("M=D\n")
 
     @file.write("@#{func_name}")
@@ -108,7 +108,7 @@ class CodeWriter
   end
 
   def write_return
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}\n")
+    @file.write("@#{REGISTERS[:local]}\n")
     @file.write("D=M\n")
     @file.write("@R9\n")
     @file.write("M=D\n")
@@ -125,16 +125,16 @@ class CodeWriter
 
     @file.write("@R9\n")
     @file.write("D=M-1\n")
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:that]}\n")
+    @file.write("@#{REGISTERS[:that]}\n")
     @file.write("M=D\n")
     @file.write("D=D-1\n")
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:this]}\n")
+    @file.write("@#{REGISTERS[:this]}\n")
     @file.write("M=D\n")
     @file.write("D=D-1\n")
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:argument]}\n")
+    @file.write("@#{REGISTERS[:argument]}\n")
     @file.write("M=D\n")
     @file.write("D=D-1\n")
-    @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[:local]}\n")
+    @file.write("@#{REGISTERS[:local]}\n")
     @file.write("M=D\n")
 
     @file.write("@R10\n")
@@ -148,7 +148,7 @@ class CodeWriter
   private
 
   # p.156のmemory segment mappingを参照
-  RESERVED_KEYWORDS_TO_REGISTERS = {
+  REGISTERS = {
     local: 'LCL',
     argument: 'ARG',
     this: 'THIS',
@@ -167,7 +167,7 @@ class CodeWriter
       @file.write("@#{index}\n")
       @file.write("D=A\n")
     when 'local', 'argument', 'this', 'that', 'temp', 'pointer'
-      @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym]}\n")
+      @file.write("@#{REGISTERS[segment.to_sym]}\n")
       @file.write("A=M\n") if %w[local argument this that].include?(segment)
       index.times do |_i|
         @file.write("A=A+1\n")
@@ -185,7 +185,7 @@ class CodeWriter
     @file.write("D=M\n")
     case segment
     when 'local', 'argument', 'this', 'that', 'temp', 'pointer'
-      @file.write("@#{RESERVED_KEYWORDS_TO_REGISTERS[segment.to_sym]}\n")
+      @file.write("@#{REGISTERS[segment.to_sym]}\n")
       @file.write("A=M\n") if %w[local argument this that].include?(segment)
       index.times do |_i|
         @file.write("A=A+1\n")
