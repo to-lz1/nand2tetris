@@ -8,11 +8,13 @@ class CodeWriter
   end
 
   def write_init
+    @file.write("@256\n")
+    @file.write("D=A\n")
     @file.write("@SP\n")
-    @file.write("M=256\n")
+    @file.write("M=D\n")
     @file.write("@Sys.init\n")
     @file.write("0;JMP\n")
-    @file.write("(@Sys.init)\n")
+    @file.write("(Sys.init)\n")
   end
 
   def write_arithmetic(command)
@@ -87,7 +89,7 @@ class CodeWriter
 
     @file.write("@SP\n")
     @file.write("D=M\n")
-    @file.write("@#{5 + args_size}\n")
+    @file.write("@#{5 + args_size.to_i}\n")
     @file.write("D=D-A\n")
     @file.write("@#{REGISTERS[:argument]}\n")
     @file.write("M=D\n")
@@ -104,6 +106,7 @@ class CodeWriter
 
   def write_function(func_name, locals_size)
     @current_func_name = func_name
+    @file.write("(#{@current_func_name})\n")
 
     @file.write("D=0\n")
     locals_size.to_i.times do |_i|
@@ -131,24 +134,44 @@ class CodeWriter
     write_pop_from_stack
     @file.write("D=M\n")
     @file.write("@#{REGISTERS[:argument]}\n")
+    @file.write("A=M\n")
     @file.write("M=D\n")
 
     # set SP to ARG + 1
     @file.write("D=A+1\n")
     @file.write("@SP\n")
-    @file.write("A=D\n")
+    @file.write("M=D\n")
 
     @file.write("@R9\n")
     @file.write("D=M-1\n")
+    @file.write("@R11\n")
+    @file.write("M=D\n")
+    @file.write("A=D\n")
+    @file.write("D=M\n")
     @file.write("@#{REGISTERS[:that]}\n")
     @file.write("M=D\n")
-    @file.write("D=D-1\n")
+    @file.write("@R11\n")
+    @file.write("D=M-1\n")
+    @file.write("@R11\n")
+    @file.write("M=D\n")
+    @file.write("A=D\n")
+    @file.write("D=M\n")
     @file.write("@#{REGISTERS[:this]}\n")
     @file.write("M=D\n")
-    @file.write("D=D-1\n")
+    @file.write("@R11\n")
+    @file.write("D=M-1\n")
+    @file.write("@R11\n")
+    @file.write("M=D\n")
+    @file.write("A=D\n")
+    @file.write("D=M\n")
     @file.write("@#{REGISTERS[:argument]}\n")
     @file.write("M=D\n")
-    @file.write("D=D-1\n")
+    @file.write("@R11\n")
+    @file.write("D=M-1\n")
+    @file.write("@R11\n")
+    @file.write("M=D\n")
+    @file.write("A=D\n")
+    @file.write("D=M\n")
     @file.write("@#{REGISTERS[:local]}\n")
     @file.write("M=D\n")
 
