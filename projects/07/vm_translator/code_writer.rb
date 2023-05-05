@@ -12,9 +12,7 @@ class CodeWriter
     @file.write("D=A\n")
     @file.write("@SP\n")
     @file.write("M=D\n")
-    @file.write("@Sys.init\n")
-    @file.write("0;JMP\n")
-    @file.write("(Sys.init)\n")
+    write_call("Sys.init", 0)
   end
 
   def write_arithmetic(command)
@@ -115,7 +113,6 @@ class CodeWriter
   end
 
   def write_return
-    @current_func_name = nil
 
     # define R9 as FRAME, and set LCL value to FRAME
     @file.write("@#{REGISTERS[:local]}\n")
@@ -126,6 +123,8 @@ class CodeWriter
     # get return address(= LCL - 5), and set it to TEMP variable
     @file.write("@5\n")
     @file.write("D=D-A\n")
+    @file.write("A=D\n")
+    @file.write("D=M\n")
     @file.write("@R10\n")
     @file.write("M=D\n")
 
