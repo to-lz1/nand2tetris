@@ -4,15 +4,16 @@
 require './code_writer'
 require './parser'
 
-def translate(source_path)
+def translate(source_dir)
 
-  output_name = output_file_path(source_path)
-
+  vm_files = Dir.glob("#{source_dir}/*.vm")
+  raise "ERROR: There is no .vm files in #{source_dir}!" if vm_files.empty?
+  
+  output_name = output_file_path(source_dir)
   writer = CodeWriter.new
   writer.set_file_name(output_name)
   writer.write_init
 
-  vm_files = Dir.glob("#{source_path}/*.vm")
   vm_files.each { |vm_file|
 
     parser = Parser.new(vm_file)
@@ -45,10 +46,10 @@ def translate(source_path)
   writer.close
 end
 
-def output_file_path(source_path)
-  dirname = File.dirname(source_path)
-  basename = File.basename(source_path) + '.asm'
-  File.join(dirname, basename)
+def output_file_path(source_dir)
+  basename = File.basename(source_dir) + '.asm'
+  File.join(source_dir, basename)
 end
 
+# usage: ./vm_translator.rb path/of/directory/including_some_vm_files
 translate(ARGV[0]) if $PROGRAM_NAME == __FILE__
