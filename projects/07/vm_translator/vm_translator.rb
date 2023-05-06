@@ -3,16 +3,17 @@
 
 require './code_writer'
 require './parser'
+require 'optparse'
 
-def translate(source_dir)
+def translate(source_dir, skip_init)
 
   vm_files = Dir.glob("#{source_dir}/*.vm")
   raise "ERROR: There is no .vm files in #{source_dir}!" if vm_files.empty?
-  
+
   output_name = output_file_path(source_dir)
   writer = CodeWriter.new
   writer.set_file_name(output_name)
-  writer.write_init
+  writer.write_init unless skip_init
 
   vm_files.each { |vm_file|
 
@@ -52,4 +53,12 @@ def output_file_path(source_dir)
 end
 
 # usage: ./vm_translator.rb path/of/directory/including_some_vm_files
-translate(ARGV[0]) if $PROGRAM_NAME == __FILE__
+if $PROGRAM_NAME == __FILE__
+  skip_init = false
+
+  opt = OptionParser.new
+  opt.on('--skip-init', desc='skip writing init code') { skip_init = true }
+  opt.parse(ARGV)
+
+  translate(ARGV[0], skip_init)
+end
