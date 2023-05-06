@@ -11,13 +11,13 @@ def translate(source_dir, skip_init)
   raise "ERROR: There is no .vm files in #{source_dir}!" if vm_files.empty?
 
   output_name = output_file_path(source_dir)
-  writer = CodeWriter.new
-  writer.set_file_name(output_name)
+  writer = CodeWriter.new(output_name)
   writer.write_init unless skip_init
 
   vm_files.each { |vm_file|
 
     parser = Parser.new(vm_file)
+    writer.set_file_name(File.basename(vm_file, '.vm'))
 
     while parser.has_more_commands?
       parser.advance

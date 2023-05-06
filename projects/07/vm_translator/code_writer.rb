@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
 class CodeWriter
-  def set_file_name(file_name)
-    init_stream(file_name)
-    @basename = File.basename(file_name, '.asm')
+  def initialize(output_name)
+    init_stream(output_name)
     @label_index = 0
+  end
+
+  def set_file_name(file_name)
+    @file_name = file_name
   end
 
   def write_init
@@ -213,7 +216,7 @@ class CodeWriter
       end
       @file.write("D=M\n")
     when 'static'
-      @file.write("@#{@basename}.#{index}\n")
+      @file.write("@#{@file_name}.#{index}\n")
       @file.write("D=M\n")
     end
     write_push_into_stack
@@ -230,7 +233,7 @@ class CodeWriter
         @file.write("A=A+1\n")
       end
     when 'static'
-      @file.write("@#{@basename}.#{index}\n")
+      @file.write("@#{@file_name}.#{index}\n")
     end
     @file.write("M=D\n")
   end
